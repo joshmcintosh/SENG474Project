@@ -8,7 +8,7 @@ import os
 
 import googleapiclient.discovery
 import googleapiclient.errors
-from src.getdevkey import getdevkey
+from getdevkey import getdevkey
 
 scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
 DEVELOPER_KEY = getdevkey()
