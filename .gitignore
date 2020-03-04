@@ -133,3 +133,6 @@ dmypy.json
 
 # API key secret
 **/secret.json
+
+# dataset folder
+/data
