@@ -11,6 +11,7 @@ import pandas as pd
 
 def load_dataset(path, relevant_cols=[]):
     data = pd.read_csv(path)
+    data = data.drop_duplicates(subset='video_id', ignore_index=True) # drop duplicate video ids
     if relevant_cols != []:
         data = pd.DataFrame(data, columns=relevant_cols)
 
