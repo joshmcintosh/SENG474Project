@@ -3,6 +3,19 @@ from youtube_transcript_api import YouTubeTranscriptApi as T_API
 import numpy as np
 from dataset import load_dataset
 import time
+import re
+
+def process_transcript(transcript):
+    # extract words from transcript
+    extracted_transcript = []
+    for line in transcript:
+        text = line['text']
+        text = text.lower()
+        text = text.split()
+        text = [re.sub('[^A-Za-z0-9]+', '', word) for word in text]
+        extracted_transcript = extracted_transcript + text
+
+    return extracted_transcript
 
 def get_transcripts(video_ids):
     transcripts = []
@@ -11,7 +24,9 @@ def get_transcripts(video_ids):
     for video_id in video_ids:
         # get transcripts from api
         try:
-            transcripts.append(T_API.get_transcript(video_id))
+            transcript = T_API.get_transcript(video_id)
+            transcript = process_transcript(transcript)
+            transcripts.append(transcript)
             print('SUCCESS: retrieved transcript for: ', video_id)
             success_count += 1
             
@@ -36,7 +51,7 @@ def main():
 
     # measure time
     start = time.time()
-    transcripts = get_transcripts(video_ids) # get thumbnails as numpy array
+    transcripts = get_transcripts(video_ids) # get transcripts as numpy array
     end = time.time()
     print('Completed in: ', end - start)
 
