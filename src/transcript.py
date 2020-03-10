@@ -1,7 +1,7 @@
 # code to get transcripts from dataset
 from youtube_transcript_api import YouTubeTranscriptApi as T_API
-import numpy as np
 from dataset import load_dataset
+import numpy as np
 import time
 import re
 
@@ -17,21 +17,22 @@ def process_transcript(transcript):
 
     return extracted_transcript
 
-def get_transcripts(video_ids):
+def get_transcripts(video_ids, category_ids):
     transcripts = []
     success_count = 0
     count = 0
-    for video_id in video_ids:
+    for i, video_id in enumerate(video_ids):
         # get transcripts from api
         try:
             transcript = T_API.get_transcript(video_id)
             transcript = process_transcript(transcript)
+            transcript.append(category_ids[i])
             transcripts.append(transcript)
-            print('SUCCESS: retrieved transcript for: ', video_id)
+            print('SUCCESS: retrieved transcript for: ', video_id, ', count: ', count)
             success_count += 1
             
         except:
-            print('Error retrieving transcript for: ', video_id)
+            print('Error retrieving transcript for: ', video_id, ', count: ', count)
             transcripts.append(-1)
         count += 1
 
@@ -44,14 +45,15 @@ def get_transcripts(video_ids):
 def main():
 
     # load video_ids from dataset
-    path_to_dataset = '../../data/custom_dataset.csv'
-    dataset = load_dataset(path_to_dataset, ['video_id'])
+    path_to_dataset = 'custom_dataset_2.csv'
+    dataset = load_dataset(path_to_dataset, ['video_id', 'category_id'])
 
     video_ids = dataset['video_id'].tolist()
+    category_ids = dataset['category_id'].tolist()
 
     # measure time
     start = time.time()
-    transcripts = get_transcripts(video_ids) # get transcripts as numpy array
+    transcripts = get_transcripts(video_ids, category_ids) # get transcripts as numpy array
     end = time.time()
     print('Completed in: ', end - start)
 
