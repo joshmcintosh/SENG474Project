@@ -2,14 +2,16 @@ import re
 
 import cv2
 import numpy as np
-import pytesseract
+
+# import pytesseract
 from dataset import load_dataset
 from thumbnail import get_thumbnails
+from east_detector import east_detector
 
-pytesseract.pytesseract.tesseract_cmd = (
-    r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-)
-DATASET_PATH = "./dataset.csv"
+# pytesseract.pytesseract.tesseract_cmd = (
+#     r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+# )
+DATASET_PATH = "./dataset_final.csv"
 CASC_PATH = "./haarcascade_frontalface_default.xml"
 # Use debug ONLY with a small dataset (<30)
 DEBUG = False
@@ -50,14 +52,17 @@ def calculate_features(image_data, face_scale_factor=1.001):
         )
 
         # TEXT RECOGNITION
-        # Use a bilateral filter to try and make it easier for pytesseract
-        image_filt = cv2.bilateralFilter(image, d=7, sigmaColor=150, sigmaSpace=50)
-        # pytesseract expects a rgb image, not a bgr as cv2 makes
-        image_filt = cv2.cvtColor(image_filt, cv2.COLOR_BGR2RGB)
-        # Run the text detection and return the found text
-        text = pytesseract.image_to_string(image_filt)
-        # Strip all non-alphanumeric characters to reduce false positives
-        text = re.sub("[^A-Za-z]+", "", text)
+        # # Use a bilateral filter to try and make it easier for pytesseract
+        # image_filt = cv2.bilateralFilter(image, d=7, sigmaColor=150, sigmaSpace=50)
+        # # pytesseract expects a rgb image, not a bgr as cv2 makes
+        # image_filt = cv2.cvtColor(image_filt, cv2.COLOR_BGR2RGB)
+        # # Run the text detection and return the found text
+        # text = pytesseract.image_to_string(image_filt)
+        # # Strip all non-alphanumeric characters to reduce false positives
+        # text = re.sub("[^A-Za-z]+", "", text)
+
+        # This uses the EAST text detector to identify text. It returns locations that contain text, not the text itself
+        text = len(east_detector(image, min_confidence=0.8, debug=DEBUG))
 
         # Add to dictionary
         thumbnail_features.append([image_mean, image_grad_mean, len(faces), text])
@@ -73,7 +78,6 @@ def calculate_features(image_data, face_scale_factor=1.001):
                     text,
                 )
             )
-            cv2.imwrite("outputFileBLF{0:02d}".format(i) + ".png", image_filt)
 
     np_thumbnail_features = np.asarray(thumbnail_features)
     return np_thumbnail_features

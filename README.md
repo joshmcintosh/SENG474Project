@@ -15,3 +15,6 @@ Note that you do not need an API key if you are just using the `youtube_transcri
 7. Tick Restricted
 8. Select the YouTube API v3 from the drop down
 9. Copy the key and paste it into the `secret.json` file in your src folder
+
+## Thumbnail Classification
+The implementation of the thumbnail classifier requires the EAST text detection model, which can be downloaded from [here](https://github.com/oyyd/frozen_east_text_detection.pb). The `frozen_east_text_detection.pb` file should be placed in the `src` folder.
